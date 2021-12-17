@@ -276,7 +276,11 @@ class GitProfile:
             sizing_mode ='fixed'
             )
         copy_button.js_on_event("button_click", CustomJS(args=dict(text=self.readme_markdown), code="""
-            navigator.clipboard.writeText(text);
+                navigator.clipboard.writeText(text).then(function() {
+                console.log('Async: Copying to clipboard was successful!');
+                }, function(err) {
+                console.error('Async: Could not copy text: ', err);
+                });
             """))
 
         no_event = streamlit_bokeh_events(

@@ -1,5 +1,5 @@
 bokeh==2.4.1
-nltk==3.4.5
+nltk==3.6.5
 requests==2.26.0
 streamlit==1.2.0
 streamlit_bokeh_events==0.1.2
