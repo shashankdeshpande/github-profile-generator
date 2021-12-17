@@ -203,14 +203,22 @@ class GitProfile:
             url = 'https://raw.githubusercontent.com/shashankdeshpande/github-profile-generator/main/logos'
 
         sites = ['LinkedIn','Twitter', 'Instagram','YouTube','Medium','StackOverflow']
+        placeholder_url = {
+            'LinkedIn':'https://linkedin.com/...',
+            'Twitter':'https://twitter.com/...',
+            'Instagram':'https://instagram.com/...',
+            'YouTube':'https://youtube.com/c/...',
+            'Medium':'https://medium.com/...',
+            'StackOverflow':'https://stackoverflow.com/...'
+        }
         n_cols = 2
         site_chunks = [sites[i:i + n_cols] for i in range(0, len(sites), n_cols)]
         contacts = {}
         for i in site_chunks:
             col1, col2 = exp.columns(n_cols)
             input_data = {
-                i[0].lower(): col1.text_input(i[0]),
-                i[1].lower(): col2.text_input(i[1])
+                i[0].lower(): col1.text_input(label=i[0], placeholder=placeholder_url[i[0]]),
+                i[1].lower(): col2.text_input(label=i[1], placeholder=placeholder_url[i[1]])
             }
             for k, v in input_data.items():
                 if v and self.is_valid_url(v):
