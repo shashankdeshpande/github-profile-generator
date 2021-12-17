@@ -1,11 +1,13 @@
 import re
 import json
 import requests
-from requests.api import head, options
-import streamlit as st
-from nltk.util import everygrams
-from copy import deepcopy
 import urllib
+import streamlit as st
+from copy import deepcopy
+from nltk.util import everygrams
+from bokeh.models import CustomJS
+from bokeh.models.widgets import Button
+from streamlit_bokeh_events import streamlit_bokeh_events
 
 class GitProfile:
 
@@ -18,6 +20,7 @@ class GitProfile:
             )
         with open('metadata.json') as f:
             self.metadata = json.load(f)
+        self.make_st_changes()
     
     @st.cache(show_spinner=False, suppress_st_warning=True, allow_output_mutation=True)
     def is_valid_url(self, url):
@@ -59,7 +62,7 @@ class GitProfile:
                 raise 'User not found'
         except:
             user_info = {}
-            st.error('Invalid username')
+            st.error('This is not a valid GitHub username!')
         return user_info
     
     @st.cache(show_spinner=False, suppress_st_warning=True, allow_output_mutation=True)
@@ -160,6 +163,7 @@ class GitProfile:
         exp = st.sidebar.expander(label='About me')
         header = exp.text_input(
             label='Heading',
+            value='About me:'
         )
         about_me_points = [
             '- 🔭 I’m currently working on ...',
@@ -174,7 +178,7 @@ class GitProfile:
         about_me = exp.text_area(
             label='Info',
             value='\n'.join(about_me_points) if self.user_info else '',
-            height=230
+            height=230 if self.user_info else None
         )
         if about_me:
             if header:
@@ -264,9 +268,6 @@ class GitProfile:
             self.add_to_markdown(f'<code><img height="{icon_size}" src="{topics[i]}"></code>')
         
     def show_copy_button(self):
-        from bokeh.models.widgets import Button
-        from bokeh.models import CustomJS
-        from streamlit_bokeh_events import streamlit_bokeh_events
         copy_button = Button(
             label="Copy to clipboard",
             width=30,
@@ -398,7 +399,6 @@ class GitProfile:
             
         
     def main(self):
-        self.make_st_changes()
         self.clear_markdown()
         main_header = '''
             <a href="https://github.com/shashankdeshpande/github-profile-generator" target="_blank" style="text-decoration: none; color: black">
@@ -417,7 +417,8 @@ class GitProfile:
         profile_place = st.empty()
 
         username = st.sidebar.text_input(
-            label='GitHub Username'
+            label='GitHub Username',
+            placeholder='Enter username without domain'
             )
         if username:
             self.user_info = self.get_user_info(username)
@@ -432,7 +433,7 @@ class GitProfile:
         if self.user_info:
             self.add_git_stats(username)
 
-        if self.readme_markdown:
+        if username and self.readme_markdown:
             with st.expander('README file preview'):
                 self.readme_markdown = st.text_area('', value=self.readme_markdown, height=500)
             
